@@ -10,11 +10,10 @@ from bs4 import BeautifulSoup
 import datetime
 from timeout_decorator import timeout, TimeoutError
 
-from robulaplus import RobulaPlus, TimeoutException
+from Classes.robulaplus import RobulaPlus, TimeoutException
 
 considered_tag_dictionary = {"id": 0, "string": 0, "ul": 0, "li": 0, "h1": 0, "h2": 0, "h3": 0, "h4": 0, "h5": 0,
-                             "div": 0
-    , "span": 0, "form": 0, "input": 0, "p": 0, "img": 0, 'a': 0, "dl": 0, "dt": 0, "dd": 0, "svg": 0, "path": 0, "g": 0
+                             "div": 0, "span": 0, "form": 0, "input": 0, "p": 0, "img": 0, 'a': 0, "dl": 0, "dt": 0, "dd": 0, "svg": 0, "path": 0, "g": 0
     , "option": 0, "i": 0, "attribute": 0, "button": 0, "class": 0, "href": 0, "other": 0}
 link_tags = ["src", "a", "action", "href"]
 
@@ -127,11 +126,8 @@ def generate_vector(node, node_value, timestamp, position, length, depth, nr_sib
 
 
 def generate_vectors_from_navigable_string(next_dom, timestamp, soup, index):
-    # siblings_dict = considered_tag_dictionary.copy()
     xpath = xpath_soup(soup)
     changed = element_changed(next_dom, xpath, soup, text_content=soup.string)
-    # nodetype = considered_tag_dictionary.copy()
-    # nodetype["string"] = 1
     length = cal_length(soup)
     depth = cal_depth(soup)
     vector = generate_vector("string", "", timestamp, index, length, depth, 0, 0, xpath, True, changed)
@@ -163,27 +159,12 @@ def generate_vectors_from_soup(next_dom, timestamp, soup):
 
 def generate_vectors_for_attr(next_dom, timestamp, soup, xpath):
     if "id" in soup.attrs:
-        # if attr == "id":
-        # if attr == "class":
-        #     nr_of_children = len(soup.attrs[attr])
-        # else:
-        #     nr_of_children = 1
         value = soup.attrs.get("id")
-        # if attr  in link_tags:
-        # value = remove_link_prefix(soup.attrs[attr])
-        # siblings_vector = get_siblings_attr(soup, attr)
-        # xpath = xpath + "/" + attr
         length = cal_length(soup, True)
         changed = element_changed(next_dom, xpath, soup, attribute="id", text_content=value)
-        # nodetype = considered_tag_dictionary.copy()
-        # if attr in nodetype.keys():
-        #     nodetype[attr] = 1
-        # else:
-        #     nodetype["other"] = 1
         depth = cal_depth(soup)
         return (generate_vector("id", str(value),
                                 timestamp, 0, length, depth, len(soup.attrs) - 1, 0, xpath, True, changed))
-        # return final_vectors
     else:
         return False
 

@@ -1,6 +1,5 @@
 import os
 import random
-
 from bs4 import BeautifulSoup
 import Classes.PredictionClass as PC
 
@@ -15,7 +14,7 @@ def get_random_element(website: str):
 
 
 if __name__ == "__main__":
-    path_to_model = os.getcwd() + "\\cross_training.joblib"
+    path_to_model = os.getcwd() + "\\database\\cross_training.joblib"
     path_to_html = "Medium.html"
 
     with open(path_to_html, 'r', encoding='utf-8') as file:

@@ -5,7 +5,7 @@ import queue
 from time import perf_counter
 
 from Classes.DynamicPredictorClass import DynamicPredictor
-from database.statistics.soup_operations import cal_length, cal_depth, get_siblings_soup, remove_link_prefix, \
+from Classes.soup_operations import cal_length, cal_depth, get_siblings_soup, remove_link_prefix, \
     position_in_level, link_tags, get_siblings_attr, ignored_list, find_soup_root
 
 

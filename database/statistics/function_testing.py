@@ -2,7 +2,7 @@ import unittest
 
 from bs4 import BeautifulSoup
 
-from database.statistics.soup_operations import  cal_depth, get_siblings_soup, \
+from Classes.soup_operations import  cal_depth, get_siblings_soup, \
     generate_vectors_for_attr, generate_vectors_from_soup, xpath_soup, find_element_by_xpath_soup, \
     element_changed
 

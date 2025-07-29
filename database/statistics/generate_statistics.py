@@ -4,7 +4,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 # from Classes.PredictionClass import PredictionClass
 import database.statistics.graphics as graphics
-import soup_operations as so
+import Classes.soup_operations as so
 import Classes.PredictionClass as PC
 
 
