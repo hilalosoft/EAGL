@@ -18,11 +18,22 @@ git clone https://github.com/yourusername/EAGL.git
 cd EAGL
 ```
 
+Install the Requirements from the file
+
+```sh
 pip install -r requirements.txt 
+```
+
+You can also use the virtual enviroment in the repository
+
+```sh
+cd EAGL
+.\venv\Scripts\activate
+```
 
 ### Usage
 
-Run the main executor script:
-
-python [EAGL_excutor.py]
-
+Run the main executor script which will select a random element from the HTML page, generate and print the locator and the time it took to generate the locator:
+```sh
+python EAGL_excutor.py
+```
