@@ -21,5 +21,8 @@ if __name__ == "__main__":
         website = file.read()
 
     target_element = get_random_element(website)
-    locators, time_to_generate = PC.generate_locators_prediction_model(target_element, path_to_model)
-    print(locators, time_to_generate)
+    try:
+        locators, time_to_generate = PC.generate_locators_prediction_model(target_element, path_to_model)
+        print(f"Generated Locator:{locators}")
+    except ValueError as e:
+        print(e)

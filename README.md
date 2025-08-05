@@ -33,7 +33,13 @@ cd EAGL
 
 ### Usage
 
-Run the main executor script which will select a random element from the HTML page, generate and print the locator and the time it took to generate the locator:
+Run the main executor script which will select a random element from the HTML page, generate and print the locator and the time it took to generate the locator using EAGL:
 ```sh
 python EAGL_excutor.py
 ```
+Run robulaplus.py and selenium_excutable.py to generate locators using selenium and robulaplus:
+```sh
+python robulaplus.py
+python selenium_excutable.py
+```
+

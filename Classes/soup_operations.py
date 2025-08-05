@@ -10,11 +10,8 @@ from bs4 import BeautifulSoup
 import datetime
 from timeout_decorator import timeout, TimeoutError
 
-from Classes.robulaplus import RobulaPlus, TimeoutException
 
-considered_tag_dictionary = {"id": 0, "string": 0, "ul": 0, "li": 0, "h1": 0, "h2": 0, "h3": 0, "h4": 0, "h5": 0,
-                             "div": 0, "span": 0, "form": 0, "input": 0, "p": 0, "img": 0, 'a': 0, "dl": 0, "dt": 0, "dd": 0, "svg": 0, "path": 0, "g": 0
-    , "option": 0, "i": 0, "attribute": 0, "button": 0, "class": 0, "href": 0, "other": 0}
+
 link_tags = ["src", "a", "action", "href"]
 
 ignored_list = ["<class 'bs4.element.Script'>",
@@ -27,6 +24,9 @@ ignored_list = ["<class 'bs4.element.Script'>",
                 "<class 'bs4.element.ProcessingInstruction'>",
                 "<class 'bs4.element.CData'>"]
 
+considered_tag_dictionary = {"id": 0, "string": 0, "ul": 0, "li": 0, "h1": 0, "h2": 0, "h3": 0, "h4": 0, "h5": 0,
+                             "div": 0, "span": 0, "form": 0, "input": 0, "p": 0, "img": 0, 'a': 0, "dl": 0, "dt": 0, "dd": 0, "svg": 0, "path": 0, "g": 0
+    , "option": 0, "i": 0, "attribute": 0, "button": 0, "class": 0, "href": 0, "other": 0}
 
 
 # we copy the dictionary containing considered tags iterate over all the siblings,
@@ -143,14 +143,7 @@ def generate_vectors_from_soup(next_dom, timestamp, soup):
     soup_id = generate_vectors_for_attr(next_dom, timestamp, soup, xpath)
     if soup_id:
         vector_list.append(soup_id)
-    # for vector in generate_vectors_for_attr(next_dom, timestamp, soup, xpath):
-    #     vector_list.append(vector)
     changed = element_changed(next_dom, xpath, soup)
-    # nodetype = considered_tag_dictionary.copy()
-    # if soup.name in nodetype.keys():
-    #     nodetype[soup.name] = 1
-    # else:
-    #     nodetype["other"] = 1
     depth = cal_depth(soup)
     vector_list.append(generate_vector(soup.name, "", timestamp, position,
                                        length, depth, nr_siblings, nr_of_children, xpath, False, changed))
@@ -175,20 +168,6 @@ def remove_link_prefix(link):
         return links[len(links) - 1]
     else:
         return ""
-    # if len(links) > 1:
-    #     if len(links) > 2:
-    #         weblinks = links[1].split('/')[0]
-    #         if weblinks == "web.archive.org" or weblinks == "wayback.archive-it.org" or weblinks == "arquivo.pt":
-    #             return links[2]
-    #         else:
-    #             return links[1]
-    #     elif len(links) > 1:
-    #         return link[1]
-    #     else:
-    #         return link
-    # else:
-    #     return links[1]
-
 
 def element_changed(next_dom, xpath, soup, attribute=None, text_content=None):
     if attribute:
@@ -199,23 +178,6 @@ def element_changed(next_dom, xpath, soup, attribute=None, text_content=None):
         return True
     else:
         return False
-
-    # if attribute is not None:
-    #     attribute_value = element_to_compare.attrs.get(attribute)
-    #     if attribute in link_tags:
-    #         attribute_value = remove_link_prefix(attribute_value)
-    #     if attribute_value != text_content:
-    #         return True
-    #     else:
-    #         return False
-    # if text_content:
-    #     if element_to_compare.string != soup.string:
-    #         return True
-    #
-    # if element_to_compare.name != soup.name:
-    #     return True
-    #
-    # return False
 
 
 def find_element_by_xpath_soup(xpath, next_dom):
@@ -359,15 +321,6 @@ class featureClass:
         if element.name in ["head", "script", "style"]:
             return
         for child_index, child in enumerate(element.contents, start=1):
-            # if str(type(child)) == "<class 'bs4.element.NavigableString'>":
-            #     if child == "\n":
-            #         continue
-            #     self.nr_elements += 1
-            #     feature_vector = generate_vectors_from_navigable_string(self.next_dom, self.current_timestamp, element,
-            #                                                             child_index / len(element.contents))
-            #     if feature_vector[10]:
-            #         self.nr_changed_elements += 1
-            #     self.feature_vector_timestamp.append(feature_vector)
             self.compare_dom_recursive(child)
 
         for feature_vector in generate_vectors_from_soup(self.next_dom, self.current_timestamp, element):
@@ -403,108 +356,6 @@ def position_in_level(path_element):
         return '[' + str(count) + ']'
 
 
-def generate_locator_relative(element):
-    xpath_string = "/"
-    xpath_list = []
-    current_element = element
-    while "id" not in current_element.attrs:
-        position, flag = get_siblings_soup(current_element, True)
-        if flag:
-            xpath_list.append((current_element, position))
-        else:
-            xpath_list.append((current_element, -1))
-        current_element = current_element.parent
-        try:
-            if current_element.name == "html":
-                xpath_string += '/' + current_element.name
-                break
-        except:
-            break
-    try:
-        if current_element.name != "html":
-            xpath_string += '/*[@id="' + current_element.attrs["id"] + '"]'
-    except:
-        print("nonetype")
-    for path_element in reversed(xpath_list):
-        if path_element[1] == -1:
-            xpath_string += "/" + path_element[0].name
-        else:
-            xpath_string += "/" + path_element[0].name + '[' + str(path_element[1]) + ']'
-    return xpath_string
-
-
-def generate_locators_relative_xpath(bf_elements):
-    locators_list = []
-    time_SEL = []
-    start_time = perf_counter()
-    for element in bf_elements:
-        # if (str(type(element)) not in ignored_list and
-        #         len(element.attrs) > 0):
-        locators_list.append(generate_selenium_locator(element))
-        end_time = perf_counter()
-        time_SEL.append(end_time - start_time)
-        # print(str(end_time - start_time))
-        start_time = end_time
-    return locators_list, time_SEL
-
-
-
-
-def generate_locators_robulaplus(bf_elements):
-    locators_list = []
-    time_robula = []
-    robula_plus = RobulaPlus()
-
-    for element in bf_elements:
-        start_time = perf_counter()
-        try:
-            def get_locator():
-                return robula_plus.get_robust_xpath(element, find_soup_root(element))
-
-            locator = get_locator()
-        except TimeoutError:
-            locator = None
-            print(f"Timeout: get_robust_xpath took longer than 300 seconds for element {element}")
-        except Exception as e:
-            locator = None
-            print(f"Exception: {e}")
-
-        end_time = perf_counter()
-
-        locators_list.append(locator)
-        elapsed_time = end_time - start_time
-        time_robula.append(elapsed_time)
-
-    return locators_list, time_robula
-
-
-def generate_selenium_locator(element):
-    # Get the element tag name
-    tag = element.name
-
-    # Get all the attributes of the element
-    attributes = element.attrs
-    locators = []
-
-    for attribute in attributes:
-        # Get the attribute value
-        attribute_value = attributes[attribute]
-        # Generate a random locator based on the selected attribute
-        if attribute == 'class':
-            if attribute_value:
-                locators.append((By.CLASS_NAME, attribute_value))
-        if attribute == 'id':
-            locators.append((By.ID, attribute_value))
-        if attribute == 'name':
-            locators.append((By.NAME, attribute_value))
-        if attribute == 'href':
-            locators.append((By.LINK_TEXT, attribute_value))
-        # locators.append((By.CSS_SELECTOR, f'{tag}[{attribute}="{attribute_value}"]'))
-    locators.append((By.XPATH, generate_fullxpath(element)))
-    locators.append((By.XPATH, generate_locator_relative(element)))
-    return locators
-
-
 def generate_locators_xpath(bf_elements):
     locators_list = []
     print(datetime.datetime.now())
@@ -515,30 +366,6 @@ def generate_locators_xpath(bf_elements):
     print(datetime.datetime.now())
     return locators_list
 
-
-def generate_fullxpath(element):
-    xpath_string = "/"
-    xpath_list = []
-    current_element = element
-    while current_element.name != "html":
-        position, flag = get_siblings_soup(current_element, True)
-        if flag:
-            xpath_list.append((current_element, position))
-        else:
-            xpath_list.append((current_element, -1))
-        current_element = current_element.parent
-        try:
-            if current_element.name == "html":
-                xpath_string += '/' + current_element.name
-                break
-        except:
-            break
-    for path_element in reversed(xpath_list):
-        if path_element[1] == -1:
-            xpath_string += "/" + path_element[0].name
-        else:
-            xpath_string += "/" + path_element[0].name + '[' + str(path_element[1]) + ']'
-    return xpath_string
 
 
 def find_soup_root(element):

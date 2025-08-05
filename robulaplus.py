@@ -1,3 +1,4 @@
+import random
 from bs4 import BeautifulSoup, Tag
 from itertools import chain, combinations
 from lxml import etree
@@ -101,10 +102,8 @@ class ElementComparer:
         for key, value in attrs.items():
             if key == 'class':
                 if isinstance(value, str):
-                    # For lxml: split the class string into a list of classes
                     normalized_attrs[key] = value.split()
                 elif isinstance(value, list):
-                    # For BeautifulSoup: directly use the list of classes
                     normalized_attrs[key] = value
             else:
                 normalized_attrs[key] = value
@@ -325,29 +324,24 @@ class RobulaPlus:
 
 # Example usage
 
-# html_content = '''
-# <html>
-#   <body>
-#     <div id="example">
-#       <p class="content">This is an example paragraph.</p>
-#       <a href="#">This is a link</a>
-#     </div>
-#   </body>
-# </html>
-# '''
-#
-# # Parse the HTML content with BeautifulSoup using the lxml parser
-# soup = BeautifulSoup(html_content, 'lxml')
-#
-# # Locate the element for which you want to generate an XPath
-# element = soup.find('a')
-#
-# # Initialize RobulaPlus with default options
-# robula_plus = RobulaPlus()
-#
-# # Generate the robust XPath for the given element
-# try:
-#     robust_xpath = robula_plus.get_robust_xpath(element, soup)
-#     print(f'Generated XPath: {robust_xpath}')
-# except ValueError as e:
-#     print(e)
+def get_random_element(website: str):
+    soup = BeautifulSoup(website, 'html.parser')
+    extract_elements = soup.find_all()
+    exclude_tags = ["a", "body", "html", "link", "meta", "script", "head"]
+    filtered_elements = [element for element in extract_elements if element.name not in exclude_tags]
+    element = random.sample(filtered_elements, 1)
+    return element[0]
+
+if __name__ == "__main__":
+    path_to_html = "Medium.html"
+
+    with open(path_to_html, 'r', encoding='utf-8') as file:
+        website = file.read()
+    target_element = get_random_element(website)
+    soup = BeautifulSoup(website, 'lxml')
+    robula_plus = RobulaPlus()
+    try:
+        robust_xpath = robula_plus.get_robust_xpath(target_element, soup)
+        print(f'Generated XPath: {robust_xpath}')
+    except ValueError as e:
+        print(e)
